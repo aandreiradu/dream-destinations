@@ -1,24 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, lazy, Suspense } from "react";
+import { useDispatch } from "react-redux";
+import { Route, Routes } from "react-router-dom";
+import { BulletList } from "react-content-loader";
+import { fetchDestinationsStartAsync } from "./store/destinations/destionation.actions";
+import { fetchCategoriesStartAsync } from "./store/destinations by category/dc.actions";
+import Navigation from "./components/Navigation/Navigation";
+
+const Home = lazy(() => import("./pages/Home/Home"));
+const Favorites = lazy(() => import("./pages/Favorites/Favorites"));
+const DestinationDetails = lazy(() =>
+  import("./pages/DestinationDetails/DestinationDetails")
+);
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchDestinationsStartAsync());
+    dispatch(fetchCategoriesStartAsync());
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Navigation />
+      <Routes>
+        {/* <Route path='/' element={<Navigation/>} > */}
+        <Route
+          path="/"
+          element={
+            <Suspense fallback={<p>Loading Home...</p>}>
+              <Home />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <Suspense fallback={<p>Loading Favorites...</p>}>
+              <Favorites />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/destination/:destinationId"
+          element={
+            <Suspense fallback={<p>Loading Destination Details...</p>}>
+              <DestinationDetails />
+            </Suspense>
+          }
+        />
+        {/* </Route> */}
+      </Routes>
+    </>
   );
 }
 
